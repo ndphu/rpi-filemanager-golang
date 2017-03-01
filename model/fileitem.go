@@ -11,4 +11,5 @@ type FileItem struct {
 	ModTime       time.Time `json:"modTime"`
 	UnixTimestamp int64     `json:"unixTimestamp"`
 	ChildCount    int       `json:"childCount"`
+	AbsPath       string    `json:"absPath"`
 }

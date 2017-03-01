@@ -8,12 +8,18 @@ import App from './modules/App'
 
 injectTapEventPlugin();
 
+window.getHumanReadableSize = function(bytes) {
+  if (bytes == 0) { return "0.00 B"; }
+  var e = Math.floor(Math.log(bytes) / Math.log(1024));
+  return (bytes/Math.pow(1024, e)).toFixed(2)+' '+' KMGTP'.charAt(e)+'B';
+}
+
 
 render(
 	<MuiThemeProvider>
 		<Router history={browserHistory }>
-			<Route path="/fm" component={App}>			
+			<Route path="/fm/browse" component={App}>			
 			</Route>
-			<Redirect from='*' to='/fm' />
+			<Redirect path="/fm" to="/fm/browse"/>
 		</Router>
 	</MuiThemeProvider>, document.getElementById('app'))

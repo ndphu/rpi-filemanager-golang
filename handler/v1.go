@@ -26,6 +26,7 @@ func V1(r *gin.Engine, appContext *model.AppContext) error {
 	r.GET(appContext.ContextPath+"/v1/files", func(c *gin.Context) {
 		p := c.Query("path")
 		currentDir := path.Join(appContext.RootDir, p)
+		log.Printf("List file in %s\n", currentDir)
 		fileInfos, err := ioutil.ReadDir(currentDir)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
@@ -38,6 +39,7 @@ func V1(r *gin.Engine, appContext *model.AppContext) error {
 					IsDir:         e.IsDir(),
 					ModTime:       e.ModTime(),
 					UnixTimestamp: e.ModTime().Unix(),
+					AbsPath:       path.Join(p, e.Name()),
 				}
 				if e.IsDir() {
 					fileItems[i].ChildCount = GetChildCount(path.Join(currentDir, e.Name()))
