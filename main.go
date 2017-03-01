@@ -51,6 +51,9 @@ func main() {
 		c.File("./ui/dist/index.html")
 	})
 	handler.V1(r, AppContext)
-
-	r.Run("0.0.0.0:80")
+	port := os.Getenv("FM_PORT")
+	if len(port) == 0 {
+		port = "8085"
+	}
+	r.Run(":" + port)
 }
