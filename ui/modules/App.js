@@ -1,5 +1,25 @@
 import React,{Component} from 'react'
 import { RouteHandler, browserHistory, Link } from 'react-router'
+
+// icons
+import FileFolder from 'material-ui/svg-icons/file/folder'
+import CreateNewFolder from 'material-ui/svg-icons/file/create-new-folder'
+import FileFileDownload from 'material-ui/svg-icons/file/file-download'
+import EditorInsertDriveFile from 'material-ui/svg-icons/editor/insert-drive-file'
+import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back'
+import ActionBackup from 'material-ui/svg-icons/action/backup'
+import ActionInfo from 'material-ui/svg-icons/action/info'
+import ActionHome from 'material-ui/svg-icons/action/home'
+import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart'
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+
+// colors
+import {blue700, yellow800, grey400,darkBlack } from 'material-ui/styles/colors'
+
+// components
+import IconButton from 'material-ui/IconButton';
+import CircularProgress from 'material-ui/CircularProgress';
+import IconMenu from 'material-ui/IconMenu';
 import RaisedButton from 'material-ui/RaisedButton'
 import AppBar from 'material-ui/AppBar'
 import Drawer from 'material-ui/Drawer'
@@ -8,21 +28,7 @@ import {List, ListItem} from 'material-ui/List'
 import Subheader from 'material-ui/Subheader'
 import Divider from 'material-ui/Divider'
 import Avatar from 'material-ui/Avatar'
-import FileFolder from 'material-ui/svg-icons/file/folder'
-import FileFileDownload from 'material-ui/svg-icons/file/file-download'
-import EditorInsertDriveFile from 'material-ui/svg-icons/editor/insert-drive-file'
-import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back'
-import ActionBackup from 'material-ui/svg-icons/action/backup'
-import ActionInfo from 'material-ui/svg-icons/action/info'
-import ActionHome from 'material-ui/svg-icons/action/home'
-import {blue700, yellow800, grey400,darkBlack } from 'material-ui/styles/colors'
-import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart'
-import IconButton from 'material-ui/IconButton';
-import CircularProgress from 'material-ui/CircularProgress';
-import IconMenu from 'material-ui/IconMenu';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import FlatButton from 'material-ui/FlatButton'
-import Dialog from 'material-ui/Dialog'
 
 import UploadDialog from './UploadDialog'
 
@@ -78,8 +84,7 @@ export default class App extends Component {
 
 	fetchData(path) {
 		this.setState({
-			loading: true,
-			showUpload: false
+			loading: true
 		})
 		fetch("/fm/v1/files?path=" + path).then(response => response.json()).then(json => {
 			if (json.err != undefined) {
@@ -117,12 +122,6 @@ export default class App extends Component {
 		window.open("/fm/v1/download/" + this.getCurrentPath() + "/" + f.name, "_blank").focus()
 	}
 
-	closeDrawer() {
-		this.setState({
-			open: false
-		})
-	}
-
 	getDateString(unixTimestamp) {
 		const isoString = new Date(unixTimestamp * 1000).toISOString()
 		return isoString.slice(0, 10) + " at " + isoString.slice(11, 19)
@@ -137,10 +136,19 @@ export default class App extends Component {
 		browserHistory.push("/fm/browse?path=" + f.absPath)
 	}
 
-	onAppBarUploadClick() {
+	onUploadClick() {
 		this.setState({
 			showUpload: true
 		})
+	}
+
+	uploadDialogCloseCallback() {
+		this.state.showUpload = false		
+		this.refresh()
+	}
+
+	refresh() {
+		this.fetchData(this.getCurrentPath())
 	}
 
 	
@@ -214,7 +222,20 @@ export default class App extends Component {
 					)}
 					iconElementLeft={<IconButton><ActionHome /></IconButton>}
 					onLeftIconButtonTouchTap={(e)=> this.handleLeftIconClick(e)}
-					iconElementRight={<IconButton onClick={(e)=>this.onAppBarUploadClick()}><ActionBackup/></IconButton>}/>
+					iconElementRight={
+						<IconMenu						    
+							iconButtonElement={
+						      <IconButton><MoreVertIcon /></IconButton>
+						    }
+						    targetOrigin={{horizontal: 'right', vertical: 'top'}}
+						    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+						  >
+						  	<MenuItem primaryText="Refresh" onTouchTap={(e)=>{this.refresh()}}/>
+						    <MenuItem primaryText="Upload" onTouchTap={(e)=>{this.onUploadClick(e)}}/>						    
+						    <MenuItem primaryText="New Folder" />
+						  </IconMenu>
+						}
+						/>
 
 				{this.state.loading == true ? (
 					<CircularProgress />
@@ -241,7 +262,7 @@ export default class App extends Component {
 					</div>
 					)}
 				{this.state.showUpload == true ? (
-					<UploadDialog open={this.state.showUpload} uploadPath={this.getCurrentPath()}/>
+					<UploadDialog closeCallback={()=> {this.uploadDialogCloseCallback()}} open={this.state.showUpload} uploadPath={this.getCurrentPath()}/>
 				) : (
 					<div></div>
 				)}

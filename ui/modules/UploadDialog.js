@@ -109,6 +109,13 @@ class UploadDialog extends Component {
 		})
     }
 
+    handleCloseClick() {
+    	this.setState({open: false})
+    	if (this.props.closeCallback != undefined) {
+    		this.props.closeCallback()
+    	}
+    }
+
 
 	render() {
 		var totalSize = 0
@@ -132,7 +139,7 @@ class UploadDialog extends Component {
 				      <FlatButton
 				        label="Close"
 				        primary={true}
-				        onTouchTap={(e)=>{this.setState({open: false})}}
+				        onTouchTap={(e)=>{this.handleCloseClick(e)}}
 				      />,
 				      <RaisedButton
 				        label="Upload"
